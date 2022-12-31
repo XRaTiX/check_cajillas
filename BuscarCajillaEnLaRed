@@ -1,0 +1,45 @@
+#!/bin/bash
+
+sudo arp-scan -l | grep -oP '^[\d.]+' > ~/.local/bin/IPs.txt
+
+File="/home/rangel/.local/bin/IPs.txt"
+cajilla=$(cat $File)
+adb start-server
+
+#cajilla=$(adb devices | grep -oP '^[\d.]+')
+
+for i in $cajilla; do
+    timeout 5 adb connect $i
+    #adb -s $i shell am start -a android.intent.action.VIEW  -d  "file:////storage/emulated/0/publicidad.mp4"
+    #adb -s $i push --sync ~/Desktop/publicidad/publicidad.mp4 /storage/emulated/0
+    #adb -s $i install /home/rangel/Desktop/vlc.apk
+    #adb -s $i shell media volume --show --stream 3 --set 0
+    #adb -s $i push /usr/share/nginx/html/list.m3u8 /storage/emulated/0
+    #adb -s $i shell am force-stop ru.iptvremote.android.iptv.pro
+    #adb -s $i shell am force-stop ar.tvplayer.tv &
+    #sleep 1
+    #adb -s $i push /home/rangel/Desktop/gameworld.mp4 /sdcard/
+    #adb -s $i push /home/rangel/Desktop/dj.mp4 /sdcard/
+    #adb -s $i shell input keyevent KEYCODE_HOME
+    #adb -s $i shell input keyevent 164 &
+    #adb -s $i shell input keyevent KEYCODE_POWER &
+    #adb -s $i shell input keyevent KEYCODE_WAKEUP &
+    #sleep 2
+    #adb -s $i shell monkey -p ar.tvplayer.tv -c android.intent.category.LAUNCHER 1
+    #adb -s $i shell monkey -p ru.iptvremote.android.iptv.pro -c android.intent.category.LAUNCHER 1
+    #adb -s $i shell am force-stop org.videolan.vlc
+    #sleep 2 &
+    #scrcpy -s $i
+    #adb -s $i shell am start -a android.intent.action.VIEW  -d  "http://172.16.96.229/adsM.m3u8"
+done
+
+adb devices | grep -oP '^[\d.]+' > ~/.local/bin/IPs.txt
+
+total=$(adb devices | grep -oP '^[\d.]+' | wc -l)
+printf "\n\nListo analice toda la red,hay un total de $total dispositivos android"
+#sleep 2
+#for i in $cajilla; do
+    #adb -s $i shell monkey -p ru.iptvremote.android.iptv.pro -c android.intent.category.LAUNCHER 1 &
+    #adb -s $i shell input keyevent KEYCODE_ENTER &
+    #adb -s $i shell am start -a android.intent.action.VIEW  -d  "http://172.16.96.187/rpc.m3u8"
+#done
