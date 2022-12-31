@@ -1,0 +1,33 @@
+#!/bin/bash
+cajilla=("172.29.32.51" "172.29.32.77" "172.29.32.37" "172.29.32.36" "172.29.32.73" "172.29.32.42" "172.29.32.41" "172.29.32.44" "172.29.32.46" "172.29.32.43" "172.29.32.39" )
+nombres=("Bistro Afuera 1" "Bistro Afuera 2" "Discover PB" "Proyector P1" "Escaleras 1" "Escaleras 2" "Recepcion 4" "Recepcion 3" "Recepcion 2" "Recepcion 1" "Fusion" )
+    for i in ${!cajilla[@]}; do
+        adb connect ${cajilla[$i]}:5555 &
+    done
+    #while [ true ]
+    #clear
+    #do
+    for i in ${!cajilla[@]}; do
+        adb -s ${cajilla[$i]} shell dumpsys window | grep 'mDreamingLockscreen' | cut -c19-23 > file.txt
+        file="file.txt"
+        #index=1
+        while IFS= read line
+        do
+          mShowingDream=$line
+        done <"$file"
+        # if ! [ "$mHoldingWakeLockSuspendBlocker" = "$mHoldingDisplaySuspendBlocker" ] ;then
+        if $mShowingDream ; then
+            #ssh rangel@172.29.34.119 "export DISPLAY=:0 && notify-send -u critical -i emblem-warning 'Se cayo ${nombres[$i]}!' && mpv ~/Music/sound.mp3 && sleep 2 && mpv ~/Music/sound.mp3 && sleep 2 && mpv ~/Music/sound.mp3" &
+            echo Intentare levantar la cajilla ${nombres[$i]} | systemd-cat -p warning
+            adb -s ${cajilla[$i]} shell input keyevent 66
+            sleep 2
+            adb -s ${cajilla[$i]} shell am force-stop ru.iptvremote.android.iptv.pro
+            adb -s ${cajilla[$i]} shell am force-stop org.videolan.vlc
+            sleep 2
+            adb -s ${cajilla[$i]} shell monkey -p ru.iptvremote.android.iptv.pro -c android.intent.category.LAUNCHER 1
+            #adb -s ${cajilla[$i]} shell am start -a android.intent.action.VIEW  -d  "http://172.29.47.242/ads.m3u8"
+        else
+            #adb -s ${cajilla[$i]} shell dumpsys audio | grep state: | tail -n 1 | cut -c 42-48
+            echo ${nombres[$i]}  ✔️ | systemd-cat -p info
+        fi
+    done
