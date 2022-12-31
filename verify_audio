@@ -1,0 +1,45 @@
+#!/bin/bash
+path=/home/rangel/Desktop/lol/
+verificados=/home/rangel/Desktop/videosVerificados.txt
+videos=`ls $path`
+conteo=`ls $path | wc -l`
+mean_volume=
+max_volume=
+for eachfile in $videos
+do
+   #ffmpeg -hide_banner -i $path/$eachfile  -af volumedetect -vn -f null - 2>&1 | grep mean_volume |  grep -o '91')
+   if cat $verificados | grep -q $eachfile; then
+      echo $eachfile ya verificado,saltandolo
+      conteo=$(($conteo - 1))
+      echo Quedan $conteo videos
+    else
+   ffmpeg -hide_banner -i "$path/$eachfile"  -af volumedetect -vn -f null - 2>&1 | grep 'mean_volume\|max_volume' | cut -d : -f 2 > file.txt
+   file="file.txt"
+   index=1
+   me_vol=
+   ma_vol=
+   echo $eachfile
+    while IFS= read line
+    do
+    if [ "$index" == "1" ]; then
+        echo mean_volume: $line
+        me_vol=$line
+    else
+        echo max_volume: $line
+        ma_vol=$line
+    fi
+    index=$(($index + 1))
+    done <"$file"
+    if [ "$me_vol" = "$ma_vol" ]; then
+        tput setaf 1; echo $eachfile no tiene audio,moviendolo a la carpeta sinaudio
+        mv $path/$eachfile /home/rangel/Desktop/sinaudio &
+        wait $!
+    else
+        tput setaf 2; echo $eachfile tiene audio
+        basename $path/$eachfile >> /home/rangel/Desktop/videosVerificados.txt
+    fi
+    conteo=$(($conteo - 1))
+    tput sgr0;echo Quedan $conteo videos
+    echo "Continuamos..."
+    fi
+done
